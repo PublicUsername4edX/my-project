@@ -1,1 +1,297 @@
-Hello World!
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <!--The viewport meta tag is used to improve the presentation and behavior of the
+    samples on iOS devices-->
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Abandoned Rail in Australia</title>
+
+    <link rel="stylesheet" href="http://js.arcgis.com/3.13/esri/css/esri.css">
+    <style>
+      html, body, #map {
+        height:100%;
+        width:100%;
+        margin:0;
+        padding:0;
+      }
+      .esriScalebar{
+        padding: 20px 20px;
+      }
+      #map{
+        padding:0;
+      }
+    </style>
+
+    <script>var dojoConfig = { parseOnLoad: true };</script>
+    <script src="http://js.arcgis.com/3.13/"></script>
+    <script>
+      var map;
+      require([
+        "esri/map",
+        "esri/layers/FeatureLayer",
+        "esri/dijit/PopupTemplate",
+        "esri/request",
+        "esri/geometry/Point",
+        "esri/graphic",
+        "dojo/on",
+        "dojo/_base/array",
+        "dojo/domReady!"
+      ], function(
+        Map,
+        FeatureLayer,
+        PopupTemplate,
+        esriRequest,
+        Point,
+        Graphic,
+        on,
+        array
+      ) {
+
+        var featureLayer;
+
+        map = new Map("map", {
+          basemap: "hybrid",
+          center: [134.3397, -25.698],
+          zoom: 5
+        });
+
+        //hide the popup if its outside the map's extent
+        map.on("mouse-drag", function(evt) {
+          if (map.infoWindow.isShowing) {
+            var loc = map.infoWindow.getSelectedFeature().geometry;
+            if (!map.extent.contains(loc)) {
+              map.infoWindow.hide();
+            }
+          }
+        });
+
+        //create a feature collection for the flickr photos
+        var featureCollection = {
+          "layerDefinition": null,
+          "featureSet": {
+            "features": [],
+            "geometryType": "esriGeometryPoint"
+          }
+        };
+        featureCollection.layerDefinition = {
+          "geometryType": "esriGeometryPoint",
+          "objectIdField": "ObjectID",
+          "drawingInfo": {
+            "renderer": {
+              "type": "simple",
+              "symbol": {
+                "type": "esriPMS",
+                "url": "https://s.yimg.com/pw/images/goodies/white-small-circle.png",
+                "contentType": "image/png",
+                "width": 15,
+                "height": 15
+              }
+            }
+          },
+          "fields": [{
+            "name": "ObjectID",
+            "alias": "ObjectID",
+            "type": "esriFieldTypeOID"
+          }, {
+            "name": "description",
+            "alias": "Description",
+            "type": "esriFieldTypeString"
+          }, {
+            "name": "title",
+            "alias": "Title",
+            "type": "esriFieldTypeString"
+          }]
+        };
+
+        //define a popup template
+        var popupTemplate = new PopupTemplate({
+          title: "{title}",
+          description: "{description}"
+        });
+
+        //create a feature layer based on the feature collection
+        featureLayer = new FeatureLayer(featureCollection, {
+          id: 'flickrLayer',
+          infoTemplate: popupTemplate
+        });
+
+        //associate the features with the popup on click
+        featureLayer.on("click", function(evt) {
+          map.infoWindow.setFeatures([evt.graphic]);
+        });
+
+        map.on("layers-add-result", function(results) {
+          requestPhotos();
+        });
+        //add the feature layer that contains the flickr photos to the map
+        map.addLayers([featureLayer]);
+
+      function requestPhotos() {
+        //get geotagged photos from flickr
+        //tags=flower&tagmode=all
+       // var requestHandle = esriRequest({
+       //   url: "http://api.flickr.com/services/feeds/geo?&format=json",
+       //   callbackParamName: "jsoncallback"
+        // SS add
+          var flickerAPI = "http://api.flickr.com/services/feeds/geo?jsoncallback=?";
+          var requestHandle = esriRequest({
+              url: flickerAPI,
+              content: {
+		      set: "72157625413826704",
+		      id: "61035342@N00",
+		      geo: true,
+		      tags: "West Muster, catherine hill bay nsw, finley nsw, gravesendnsw, glenreaghnsw, the plains",
+		      tagmode: "any",
+              format: "json"},
+
+              callbackParamName: "jsoncallback"
+
+        });
+        requestHandle.then(requestSucceeded, requestFailed);
+        // SS add
+        var requestHandle2 = esriRequest({
+		    url: flickerAPI,
+		    content: {
+			groupId: "1106051@N21",
+			id: "56581352@N08",
+			geo: true,
+		    tags: "banksiadale, Cordering",
+			tagmode: "any",
+		    format: "json"},
+
+		    callbackParamName: "jsoncallback"
+		});
+        requestHandle2.then(requestSucceeded, requestFailed);
+
+        requestHandle2 = esriRequest({
+		    url: flickerAPI,
+		    content: {
+			groupId: "1106051@N21",
+			id: "94854784@N06",
+			geo: true,
+		    tags: "Hamley Bridge",
+			tagmode: "any",
+		    format: "json"},
+
+		    callbackParamName: "jsoncallback"
+		});
+        requestHandle2.then(requestSucceeded, requestFailed);
+
+        requestHandle2 = esriRequest({
+		    url: flickerAPI,
+		    content: {
+			groupId: "1106051@N21",
+			id: "40262251@N03",
+			geo: true,
+		    tags: "leongathatrainstation",
+			tagmode: "any",
+		    format: "json"},
+
+		    callbackParamName: "jsoncallback"
+		});
+        requestHandle2.then(requestSucceeded, requestFailed);
+
+
+        requestHandle2 = esriRequest({
+		    url: flickerAPI,
+		    content: {
+			groupId: "1106051@N21",
+			id: "87192999@N04",
+			geo: true,
+		    tags: "oldghanrailway",
+			tagmode: "any",
+		    format: "json"},
+
+		    callbackParamName: "jsoncallback"
+		});
+        requestHandle2.then(requestSucceeded, requestFailed);
+
+        requestHandle2 = esriRequest({
+		    url: flickerAPI,
+		    content: {
+			groupId: "1106051@N21",
+			id: "82934090@N06",
+			geo: true,
+		    tags: "Mannahill Station,Rankins Springs Station,Sulphide St Station,Crookwell Station,Port pirie Station,newnes railway station,Moe Walhalla Railway,Merriwa Station,Gulgong Station,mountpleasantcollieryline,tarrawingeetramway,dalbybellbranchline,wodongacudgrewabranch,isisjcttodallarnilbranchline",
+			tagmode: "any",
+		    format: "json"},
+
+		    callbackParamName: "jsoncallback"
+		});
+        requestHandle2.then(requestSucceeded, requestFailed);
+
+        requestHandle2 = esriRequest({
+		    url: flickerAPI,
+		    content: {
+			groupId: "1106051@N21",
+			id: "82934090@N06",
+			geo: true,
+		    tags: "Conoble Station,Occidental Branch Line,Gulgong Station,narrominerailwaystation,Coolah Branch",
+			tagmode: "any",
+		    format: "json"},
+
+		    callbackParamName: "jsoncallback"
+		});
+        requestHandle2.then(requestSucceeded, requestFailed);
+
+        requestHandle2 = esriRequest({
+		    url: flickerAPI,
+		    content: {
+			groupId: "1106051@N21",
+			id: "82934090@N06",
+			geo: true,
+		    tags: "Nyngan to Bourke Line, otford tunnel",
+			tagmode: "any",
+		    format: "json"},
+
+		    callbackParamName: "jsoncallback"
+		});
+        requestHandle2.then(requestSucceeded, requestFailed);
+
+        requestHandle2 = esriRequest({
+			url: flickerAPI,
+			content: {
+			groupId: "1106051@N21",
+			id: "62542203@N06",
+			geo: true,
+			tags: "gannawarra,warburton,wakool,wonthaggi,coldstream,koonwarra,murwillumbah  ",
+			tagmode: "any",
+			format: "json"},
+
+			callbackParamName: "jsoncallback"
+		});
+        requestHandle2.then(requestSucceeded, requestFailed);
+
+      }
+
+      function requestSucceeded(response, io) {
+        //loop through the items and add to the feature layer
+        var features = [];
+        array.forEach(response.items, function(item) {
+          var attr = {};
+          attr["description"] = item.description;
+          attr["title"] = item.title ? item.title : "Flickr Photo";
+
+          var geometry = new Point(item);
+
+          var graphic = new Graphic(geometry);
+          graphic.setAttributes(attr);
+          features.push(graphic);
+        });
+
+        featureLayer.applyEdits(features, null, null);
+      }
+
+      function requestFailed(error) {
+        console.log('failed');
+      }
+    });
+    </script>
+  </head>
+  <body >
+    <div id="map"></div>
+  </body>
+
+</html>
+
